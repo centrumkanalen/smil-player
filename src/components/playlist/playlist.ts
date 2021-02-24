@@ -1047,7 +1047,7 @@ export class Playlist {
 				if (element.getAttribute('src') === null) {
 					// BrightSign does not support query parameters in filesystem
 					if (await this.doesSupportQueryParametersCompatibilityMode()) {
-						const extra = Object.entries(value).filter(([key]) => key.startsWith("data-")).map(([key, value]) => `${key.replace("data-", "")}=${value}`).join("&");
+						const extra = Object.entries(value).filter(([key]) => key.startsWith("data-")).map(([key, attributeValue]) => `${key.replace("data-", "")}=${attributeValue}`).join("&");
 						element.setAttribute('src', `${filepath}?v=${getRandomInt(1000000)}${extra.length === 0 ? '' : '&' + extra}`);
 					} else {
 						element.setAttribute('src', filepath);
