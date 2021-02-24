@@ -23,7 +23,7 @@ import {
 	SMILMedia,
 	SMILMediaNoVideo,
 	SMILIntro, SosHtmlElement, TriggerList, ParsedTriggerCondition,
-	ParsedSensor, PlayingInfo, TimedMediaResponse,
+	ParsedSensor, PlayingInfo, TimedMediaResponse, SMILAudio,
 } from '../../models';
 import {
 	FileStructure,
@@ -1033,10 +1033,11 @@ export class Playlist {
 	 * @param arrayIndex - at which index is playlist stored in currentlyPlayingPriority object
 	 */
 	private playTimedMedia = async (
-		filepath: string, regionInfo: RegionAttributes, duration: string, triggerValue: string | undefined, arrayIndex: number,
+		filepath: string, value: SMILImage | SMILWidget | SMILAudio, duration: string, triggerValue: string | undefined, arrayIndex: number,
 	): Promise<TimedMediaResponse> => {
 		return new Promise(async (resolve) => {
 			try {
+				const regionInfo =  value.regionInfo;
 				let element = <HTMLElement> document.getElementById(generateElementId(filepath, regionInfo.regionName));
 
 				// set correct duration
@@ -1046,7 +1047,8 @@ export class Playlist {
 				if (element.getAttribute('src') === null) {
 					// BrightSign does not support query parameters in filesystem
 					if (await this.doesSupportQueryParametersCompatibilityMode()) {
-						element.setAttribute('src', `${filepath}?v=${getRandomInt(1000000)}`);
+						const extra = Object.entries(value).filter(([key]) => key.startsWith("data-")).map(([key, value]) => `${key.replace("data-", "")}=${value}`).join("&");
+						element.setAttribute('src', `${filepath}?v=${getRandomInt(1000000)}${extra.length === 0 ? '' : '&' + extra}`);
 					} else {
 						element.setAttribute('src', filepath);
 					}
@@ -1657,7 +1659,7 @@ export class Playlist {
 					}
 					// widget with website url as datasource
 					if (htmlElement === HtmlEnum.ref && getFileName(elem.src).indexOf('.wgt') === -1) {
-						response = <string> await this.playTimedMedia(elem.src, elem.regionInfo, elem.dur, elem.triggerValue, index);
+						response = <string> await this.playTimedMedia(elem.src, elem, elem.dur, elem.triggerValue, index);
 						if (response === 'cancelLoop') {
 							break;
 						}
@@ -1667,7 +1669,7 @@ export class Playlist {
 						await this.playAudio(elem.localFilePath);
 						continue;
 					}
-					response = <string> await this.playTimedMedia(elem.localFilePath, elem.regionInfo, elem.dur, elem.triggerValue, index);
+					response = <string> await this.playTimedMedia(elem.localFilePath, elem, elem.dur, elem.triggerValue, index);
 					if (response === 'cancelLoop') {
 						break;
 					}
@@ -1685,7 +1687,7 @@ export class Playlist {
 				// widget with website url as datasource
 				if (htmlElement === HtmlEnum.ref && getFileName(elem.src).indexOf('.wgt') === -1) {
 					promises.push((async () => {
-						await this.playTimedMedia(elem.src, elem.regionInfo, elem.dur, elem.triggerValue, index);
+						await this.playTimedMedia(elem.src, elem, elem.dur, elem.triggerValue, index);
 					})());
 					continue;
 				}
@@ -1694,7 +1696,7 @@ export class Playlist {
 						await this.playAudio(elem.localFilePath);
 						return;
 					}
-					await this.playTimedMedia(elem.localFilePath, elem.regionInfo, elem.dur, elem.triggerValue, index);
+					await this.playTimedMedia(elem.localFilePath, elem, elem.dur, elem.triggerValue, index);
 				})());
 			}
 			await Promise.all(promises);
