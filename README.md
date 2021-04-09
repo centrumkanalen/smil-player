@@ -49,9 +49,6 @@
 - supports sensors-based triggers
 - supports conditional expressions
 
-## NOT supported features
-- not able to process files stored in local storage
-
 ### Used technology
 - webpack, typescript, mocha, xml2js, json-easy-filter
 

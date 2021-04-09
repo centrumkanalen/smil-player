@@ -25,6 +25,7 @@
     "clean": "rm -rf cache dist/*",
     "prepare": "npm run clean && npm run build",
     "build": "npm run clean && webpack --display-modules",
+    "build-production": "npm run build --production",
     "build-test": "tsc",
     "start": "webpack-dev-server --mode development --open-emulator",
     "start-cypress": "webpack-dev-server --mode none --open-emulator",
