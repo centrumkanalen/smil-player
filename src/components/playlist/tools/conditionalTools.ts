@@ -8,6 +8,7 @@ import { ConditionalExprEnum } from '../../../enums/conditionalEnums';
 import { ParsedConditionalExpr } from '../../../models/conditionalModels';
 import { setDefaultAwait } from './scheduleTools';
 import { debug, generateCurrentDate, getPosition } from './generalTools';
+import { api } from './api';
 
 export function isConditionalExpExpired(
 	element: SMILMediaSingle | PlaylistElement | PlaylistElement[], playerName: string = '', playerId: string = '',
@@ -223,12 +224,25 @@ function parseSubstringExpr(argument: string): string {
 function parseConditionalExp(elementExpr: string, playerName: string = '', playerId: string = '') {
 	let element = removeUnnecessaryCharacters(elementExpr);
 
+
 	if (element.indexOf(ConditionalExprEnum.weekDayUTC) > -1) {
 		return parseWeekDayExpr(element, ConditionalExprEnum.weekDayUTC, true);
 	}
 
 	if (element.indexOf(ConditionalExprEnum.weekDay) > -1) {
 		return parseWeekDayExpr(element, ConditionalExprEnum.weekDay, false);
+	}
+
+	if (element.indexOf(ConditionalExprEnum.api) > -1) {
+
+		let result = api(element);
+		
+		if (result === true) {
+			return true;
+		} else {
+			return false;
+		}
+		
 	}
 
 	if (element.indexOf(ConditionalExprEnum.compareConst) > -1) {

@@ -8,6 +8,7 @@ export enum ConditionalExprEnum {
 	substringAfter = 'substring-after',
 	substring = 'substring',
 	weekDay = 'weekday',
+	api = 'api',
 	weekDayUTC = 'gmweekday',
 	playerId = 'smil-playerId',
 	playerName = 'smil-playerName',
